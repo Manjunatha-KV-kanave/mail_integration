@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Data to Mail</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add your CSS styles here */
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+        }
+        .popup-content .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Contact Us</h2>
+    <form class="gform pure-form pure-form-stacked" id="submitForm" method="POST">
+        <div class="form-group">
+            <label for="contact-name">Your Name:</label>
+            <input type="text" name="name" id="contact-name" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+            <label for="contact-phone">Phone Number:</label>
+            <input type="number" name="phone" id="contact-phone" placeholder="Enter your phone number" required>
+        </div>
+        <div class="form-group">
+            <label for="contact-email">Email Address:</label>
+            <input type="email" id="contact-email" name="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" placeholder="Enter the subject" required>
+        </div>
+        <div class="form-group">
+            <label for="contact-message">Your Message:</label>
+            <textarea name="message" id="contact-message" placeholder="Enter your message" required></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+
+<!-- Confirmation Popup -->
+<div id="submitPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closePopup()">×</span>
+        <h2>Confirm Submission</h2>
+        <p>Are you sure you want to submit?</p>
+        <button onclick="sendConfirmedEmail()">Yes</button>
+    </div>
+</div>
+
+<!-- Success Popup -->
+<div id="successPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeSuccessPopup()">×</span>
+        <h2>Email Sent Successfully!</h2>
+        <p>Your email has been sent successfully.</p>
+    </div>
+</div>
+
+<script>
+    // Function to close the confirmation popup
+    function closePopup() {
+        document.getElementById('submitPopup').style.display = 'none';
+    }
+
+    // Function to close the success popup
+    function closeSuccessPopup() {
+        document.getElementById('successPopup').style.display = 'none';
+    }
+
+    // Event listener for form submission
+    document.getElementById('submitForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Validate form fields before showing the confirmation popup
+        if (validateForm()) {
+            document.getElementById('submitPopup').style.display = 'flex'; // Show the confirmation popup
+        }
+    });
+
+    // Form validation function
+    function validateForm() {
+        const name = document.getElementById('Manjunatha KV').value.trim();
+        const phone = document.getElementById('+91-8970870646').value.trim();
+        const email = document.getElementById('manjunath.kvmc@gmail.com').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+
+        if (name === '' || phone === '' || email === '' || subject === '' || message === '') {
+            alert('Please fill out all fields.');
+            return false;
+        }
+
+        // Validation for phone number
+        if (!(/^\d{10,12}$/.test(phone))) {
+            alert('Manjunatha KV');
+            return false;
+        }
+
+        // Validation for email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+            return false;
+        }
+
+        return true; // Form is valid
+    }
+
+    // Function to send the email after confirmation
+    function sendConfirmedEmail() {
+        document.getElementById('submitPopup').style.display = 'none'; // Hide the confirmation popup
+
+        const formData = new FormData(document.getElementById('submitForm'));
+
+        fetch('sendEmail.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Email not sent');
+        })
+        .then(data => {
+            document.getElementById('submitForm').reset(); // Reset the form after successful submission
+            document.getElementById('successPopup').style.display = 'flex'; // Show success popup
+            setTimeout(closeSuccessPopup, 3000); // Automatically close the success popup after 3 seconds
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+</script>
+</body>
+</html>
